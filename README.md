@@ -1,3 +1,3 @@
 # hrafn
 
-hey yo i'm a **discord bot**
+hey yo this sentence is **redundant**
