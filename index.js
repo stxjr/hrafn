@@ -13,8 +13,8 @@ client.on('ready', () => {
 client.on('message', message => {
     if (message.content.match(/^help$/i)) {
         message.channel.send('here are the commands available:\n'+
-                             'Ping: Type ping to get a response pong back.\n'+
-                             'Roll $n: Type Roll $n to get a die roll of $n sides');
+                             ' \tPing: Type ping to get a response pong back.\n'+
+                             '\tRoll $n: Type Roll $n to get a die roll of $n sides');
     }
 });
 
