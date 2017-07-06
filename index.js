@@ -19,7 +19,7 @@ client.on('message', message => {
 
 // get the id of a channel
 client.on('message', message => {
-    if (message.content.match(/id/i)) {
+    if (message.content.match(/^id$/i)) {
         message.channel.send(message.channel.id)
     }
 })
