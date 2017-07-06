@@ -47,9 +47,7 @@ client.on('message', message => {
 // how do dice even work (idk, must be hard)
 function rolldie(sides) {
     return Math.ceil((Math.random() * sides));
-}if(message.content.toLowerCase().match(/^poll/)){
-
-  }
+}
 
 // roll a die
 // usage: roll [sides]
