@@ -66,7 +66,7 @@ client.on('message', message => {
 
 //Event trigger for poll management
 client.on('message', message => {
-  var args = messaage.split(' ');
+  var args = message.split(' ');
 
   if(args[0] === 'poll'){
     if(!args.length > 1){
