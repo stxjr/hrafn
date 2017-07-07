@@ -3,11 +3,9 @@
 // import the discord.js module
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const poll = require('./poll.js'); //handels polls
 
 var token = require('./token.js').tokenid; // get token from token.js
-
-// makes sure there is only one poll at a time
-var livePoll = false;
 
 client.on('ready', () => {
   console.log('ready');
@@ -67,6 +65,7 @@ client.on('message', message => {
 client.on('message', message => {
   if (rand(120) === 120) {
     message.channel.send('*allegedly...*');
+    console.log('allegedly...');
   }
 });
 
@@ -76,11 +75,23 @@ client.on('message', message => {
 
   if (args[0] === 'poll') {
     if (args.length < 2) {
-      message.channel.send('__**Uh oh!**__ \nI don\'t understand! Try these commands to help you\n ```bash poll help || poll [option]```');
+      message.channel.send('__**Uh oh!**__ \nI don\'t understand! Try these commands to help you\n`poll help || poll [option]`');
       return;
     }
     switch (args[1]) {
-
+      case 'create':
+        if(!poll.isLive()){
+          poll.createPoll(message);
+        }else{
+          message.channel.send('__**Uh oh!**__\nA poll is aleady in progress. Please end that poll to create a new one.');
+        }
+        break;
+      case 'end':
+        if(poll.isLive()){
+          poll.endPoll(message);
+        }else{
+          message.channel.send('__**Uh oh!**__\nThere is not an active poll to close. You can use:\n`poll create`\n to create a new poll');
+        }
     }
   }
 });
