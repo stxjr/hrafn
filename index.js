@@ -45,7 +45,7 @@ client.on('message', message => {
 });
 
 // how do dice even work (idk, must be hard)
-function rolldie (sides) {
+function rand (sides) {
   return Math.ceil((Math.random() * sides));
 }
 
@@ -57,7 +57,7 @@ client.on('message', message => {
     if (sides === '') {
       sides = 6;
     }
-    var result = rolldie(sides);
+    var result = rand(sides);
     message.channel.send(result);
     console.log('die rolled: ' + result + ' out of ' + sides);
   }
@@ -65,14 +65,14 @@ client.on('message', message => {
 
 // allegedly...
 client.on('message', message => {
-  if (rolldie(120) === 120) {
+  if (rand(2) === 2) {
     message.channel.send('*allegedly...*');
   }
 });
 
 // Event trigger for poll management
 client.on('message', message => {
-  var args = message.split(' ');
+  var args = message.content.split(' ');
 
   if (args[0] === 'poll') {
     if (args.length < 1) {
