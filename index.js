@@ -3,9 +3,9 @@
 // import the discord.js module
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const poll = require('./poll.js'); //handels polls
+const poll = require('./poll.js'); // handles polls
 
-var token = require('./token.js').tokenid; // get token from token.js
+const config = require('./config.json'); // get token from token.js
 
 client.on('ready', () => {
   console.log('ready');
@@ -50,7 +50,7 @@ function rand (sides) {
 // roll a die
 // usage: roll [sides]
 client.on('message', message => {
-  if (message.content.toLowerCase().match(/^roll( \d*)?$/)) {
+  if (message.content.toLowerCase().match(/^roll( \d*)?$/) && message.author.id !== 262243091258408960) {
     var sides = message.content.replace(/[^0-9]/g, '');
     if (sides === '') {
       sides = 6;
@@ -80,16 +80,16 @@ client.on('message', message => {
     }
     switch (args[1]) {
       case 'create':
-        if(!poll.isLive()){
+        if (!poll.isLive()) {
           poll.createPoll(message);
-        }else{
+        } else {
           message.channel.send('__**Uh oh!**__\nA poll is aleady in progress. Please end that poll to create a new one.');
         }
         break;
       case 'end':
-        if(poll.isLive()){
+        if (poll.isLive()) {
           poll.endPoll(message);
-        }else{
+        } else {
           message.channel.send('__**Uh oh!**__\nThere is not an active poll to close. You can use:\n`poll create`\n to create a new poll');
         }
     }
@@ -97,4 +97,4 @@ client.on('message', message => {
 });
 
 // log in
-client.login(token);
+client.login(config.token);
