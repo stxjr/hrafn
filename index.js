@@ -75,7 +75,7 @@ client.on('message', message => {
   var args = message.content.split(' ');
 
   if (args[0] === 'poll') {
-    if (args.length < 1) {
+    if (args.length < 2) {
       message.channel.send('Uh oh!\n---------\n- - -\n I didn\'t understand that. The proper use of the poll command is:\n`poll [Option]`.\n\n If you would like a more indepth look at poll try:\n`poll help`');
       return;
     }
