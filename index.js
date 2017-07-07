@@ -65,7 +65,7 @@ client.on('message', message => {
 
 // allegedly...
 client.on('message', message => {
-  if (rand(2) === 2) {
+  if (rand(120) === 120) {
     message.channel.send('*allegedly...*');
   }
 });
