@@ -80,13 +80,13 @@ client.on('message', msg => {
     // check if user is in a channel
     if (msg.member.voiceChannel) {
       msg.member.voiceChannel.join()
-        .then(connection => {
-          msg.reply('we in bois');
-          const dispatcher = connection.playFile('/home/ubuntu/hrafn/micspam.mp3');
-          dispatcher.on('end', end => msg.member.voiceChannel.leave());
-        }).catch(console.log);
-    } else {
-      msg.reply('join a voice channel first');
+      .then(connection => {
+        return connection.playFile('/home/ubuntu/hrafn/micspam.mp3');
+      })
+      .then(dispatcher => {
+        dispatcher.on('error', console.error);
+      })
+      .catch(console.error);
     }
   }
 });
