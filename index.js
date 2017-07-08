@@ -28,7 +28,7 @@ client.on('message', message => {
 
 // get the id of a channel
 client.on('message', message => {
-  if (message.content.match(/^id$/i)) {
+  if (message.content.match(/^id$/i) && message.author.id !== 284509390604861452) {
     message.channel.send(message.channel.id);
   }
 });
@@ -50,7 +50,7 @@ function rand (sides) {
 // roll a die
 // usage: roll [sides]
 client.on('message', message => {
-  if (message.content.toLowerCase().match(/^roll( \d*)?$/) && message.author.id !== 262243091258408960) {
+  if (message.content.toLowerCase().match(/^roll( \d*)?$/) && message.author.id !== 284509390604861452) {
     var sides = message.content.replace(/[^0-9]/g, '');
     if (sides === '') {
       sides = 6;
