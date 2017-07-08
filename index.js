@@ -5,40 +5,42 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const poll = require('./poll.js'); // handles polls
 
-const config = require('./config.json'); // get token from token.js
+const config = require('./config.json'); // get config from config.js
 
 client.on('ready', () => {
   console.log('ready');
 });
 
-client.on('message', message => {
-  if (message.content.match(/^help$/i)) {
-    message.channel.send('here are the commands available:\n' +
+// help
+client.on('message', msg => {
+  if (msg.content.match(/^help$/i)) {
+    msg.channel.send('here are the commands available:\n' +
       '\tping: type ping to get a pong\n' +
       '\troll [n]: Type roll [n] to roll a die with n sides (defaults to 6)');
   }
 });
 
 // ping pong
-client.on('message', message => {
-  if (message.content.match(/^ping$/i)) {
-    message.channel.send(message.content.replace('i', 'o').replace('I', 'O'));
+client.on('message', msg => {
+  if (msg.content.match(/^ping$/i) &&
+      msg.member.roles.has(333228007676444672)) {
+    msg.channel.send(msg.content.replace('i', 'o').replace('I', 'O'));
   }
 });
 
 // get the id of a channel
-client.on('message', message => {
-  if (message.content.match(/^id$/i) && message.author.id !== 284509390604861452) {
-    message.channel.send(message.channel.id);
+client.on('message', msg => {
+  if (msg.content.match(/^id$/i)) {
+    msg.channel.send(msg.channel.id);
   }
 });
 
 // swear filter
-client.on('message', message => {
-  if (message.content.match(/bazinga/i)) {
-    var tempmessage = message;
-    message.delete();
-    tempmessage.reply('http://imgh.us/swe.jpg');
+client.on('message', msg => {
+  if (msg.content.match(/bazinga/i)) {
+    var tempmsg = msg;
+    msg.delete();
+    tempmsg.reply('http://imgh.us/swe.jpg');
   }
 });
 
@@ -49,48 +51,69 @@ function rand (sides) {
 
 // roll a die
 // usage: roll [sides]
-client.on('message', message => {
-  if (message.content.toLowerCase().match(/^roll( \d*)?$/) && message.author.id !== 284509390604861452) {
-    var sides = message.content.replace(/[^0-9]/g, '');
+client.on('message', msg => {
+  if (msg.content.match(/^roll( \d*)?$/i) &&
+      msg.member.roles.has(333217730687926282)) { // dinner rolls
+    var sides = msg.content.replace(/[^0-9]/g, '');
     if (sides === '') {
       sides = 6;
     }
     var result = rand(sides);
-    message.channel.send(result);
+    msg.channel.send(result);
     console.log('die rolled: ' + result + ' out of ' + sides);
   }
 });
 
 // allegedly...
-client.on('message', message => {
+client.on('message', msg => {
   if (rand(120) === 120) {
-    message.channel.send('*allegedly...*');
+    msg.channel.send('*allegedly...*');
     console.log('allegedly...');
   }
 });
 
+// join a voice channel
+client.on('message', msg => {
+  // if user is in dm, do nothing
+  if (!msg.guild) return;
+
+  if (msg.content.match(/^join$/i)) {
+    // check if user is in a channel
+    if (msg.member.voiceChannel) {
+      msg.member.voiceChannel.join()
+        .then(connection => {
+          msg.reply('we in bois');
+          const dispatcher = connection.playFile('/home/ubuntu/hrafn/micspam.mp3');
+          dispatcher.on('end', end => msg.member.voiceChannel.leave());
+        }).catch(console.log);
+    } else {
+      msg.reply('join a voice channel first');
+    }
+  }
+});
+
 // Event trigger for poll management
-client.on('message', message => {
-  var args = message.content.split(' ');
+client.on('message', msg => {
+  var args = msg.content.split(' ');
 
   if (args[0] === 'poll') {
     if (args.length < 2) {
-      message.channel.send('__**Uh oh!**__ \nI don\'t understand! Try these commands to help you\n`poll help || poll [option]`');
+      msg.channel.send('__**Uh oh!**__ \nI don\'t understand! Try these commands to help you\n`poll help || poll [option]`');
       return;
     }
     switch (args[1]) {
       case 'create':
         if (!poll.isLive()) {
-          poll.createPoll(message);
+          poll.createPoll(msg);
         } else {
-          message.channel.send('__**Uh oh!**__\nA poll is aleady in progress. Please end that poll to create a new one.');
+          msg.channel.send('__**Uh oh!**__\nA poll is aleady in progress. Please end that poll to create a new one.');
         }
         break;
       case 'end':
         if (poll.isLive()) {
-          poll.endPoll(message);
+          poll.endPoll(msg);
         } else {
-          message.channel.send('__**Uh oh!**__\nThere is not an active poll to close. You can use:\n`poll create`\n to create a new poll');
+          msg.channel.send('__**Uh oh!**__\nThere is not an active poll to close. You can use:\n`poll create`\n to create a new poll');
         }
     }
   }
