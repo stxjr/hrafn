@@ -75,7 +75,6 @@ client.on('message', msg => {
 // join a voice channel
 client.on('message', msg => {
   // if user is in dm, do nothing
-  if (!msg.guild) return;
 
   if (msg.content.match(/^join$/i)) {
     // check if user is in a channel
