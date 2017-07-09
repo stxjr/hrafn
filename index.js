@@ -7,6 +7,25 @@ const poll = require('./poll.js'); // handles polls
 
 const config = require('./config.json'); // get config from config.js
 
+//
+// functions
+//
+
+// how do dice even work (idk, must be hard)
+function rand (sides) {
+  return Math.ceil((Math.random() * sides));
+}
+
+function canUse (author) {
+  var can = Date.now() - author.lastMessage.createdTimestamp > 50;
+  if (can) {
+    return true;
+  } else {
+    author.lastMessage.reply('no');
+    return false;
+  }
+}
+
 client.on('ready', () => {
   console.log('ready');
 });
@@ -22,9 +41,8 @@ client.on('message', msg => {
 
 // ping pong
 client.on('message', msg => {
-  if (msg.content.match(/^ping$/i) &&
-      canUse(msg.author)) {
-    msg.channelvar.send(msg.content.replace('i', 'o').replace('I', 'O'));
+  if (msg.content.match(/^ping$/i) && canUse(msg.author)) {
+    msg.channel.send(msg.content.replace('i', 'o').replace('I', 'O'));
   }
 });
 
@@ -47,8 +65,7 @@ client.on('message', msg => {
 // roll a die
 // usage: roll [sides]
 client.on('message', msg => {
-  if (msg.content.match(/^roll( \d*)?$/i) &&
-      canUse(msg.author)) { // dinner rolls
+  if (msg.content.match(/^roll( \d*)?$/i) && canUse(msg.author)) {
     var sides = msg.content.replace(/[^0-9]/g, '');
     if (sides === '') {
       sides = 6;
@@ -69,19 +86,16 @@ client.on('message', msg => {
 
 // join a voice channel
 client.on('message', msg => {
-  // if user is in dm, do nothing
-
   if (msg.content.match(/^join$/i)) {
     // check if user is in a channel
     if (msg.member.voiceChannel) {
       msg.member.voiceChannel.join()
-      .then(connection => {
-        return connection.playFile('/home/ubuntu/hrafn/micspam.mp3');
+      .then(connection => { // Connection is an instance of VoiceConnection
+        msg.reply('I have successfully connected to the channel!');
       })
-      .then(dispatcher => {
-        dispatcher.on('error', console.error);
-      })
-      .catch(console.error);
+      .catch(console.log);
+    } else {
+      msg.reply('You need to join a voice channel first!');
     }
   }
 });
@@ -112,25 +126,6 @@ client.on('message', msg => {
     }
   }
 });
-
-///
-/// funtions
-///
-
-// how do dice even work (idk, must be hard)
-function rand (sides) {
-  return Math.ceil((Math.random() * sides));
-}
-
-function canUse(author){
-  var can = Date.now() - author.lastMessage.createdTimestamp > 50;
-  if(can){
-    return true;
-  }else{
-    author.lastMessage.reply('no');
-    return false;
-  }
-}
 
 // log in
 client.login(config.token);
