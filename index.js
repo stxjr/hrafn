@@ -23,8 +23,8 @@ client.on('message', msg => {
 // ping pong
 client.on('message', msg => {
   if (msg.content.match(/^ping$/i) &&
-      msg.member.roles.has(333228007676444672)) {
-    msg.channel.send(msg.content.replace('i', 'o').replace('I', 'O'));
+      canUse(msg.author)) {
+    msg.channelvar.send(msg.content.replace('i', 'o').replace('I', 'O'));
   }
 });
 
@@ -44,16 +44,11 @@ client.on('message', msg => {
   }
 });
 
-// how do dice even work (idk, must be hard)
-function rand (sides) {
-  return Math.ceil((Math.random() * sides));
-}
-
 // roll a die
 // usage: roll [sides]
 client.on('message', msg => {
   if (msg.content.match(/^roll( \d*)?$/i) &&
-      msg.member.roles.has(333217730687926282)) { // dinner rolls
+      canUse(msg.author)) { // dinner rolls
     var sides = msg.content.replace(/[^0-9]/g, '');
     if (sides === '') {
       sides = 6;
@@ -117,6 +112,25 @@ client.on('message', msg => {
     }
   }
 });
+
+///
+/// funtions
+///
+
+// how do dice even work (idk, must be hard)
+function rand (sides) {
+  return Math.ceil((Math.random() * sides));
+}
+
+function canUse(author){
+  var can = Date.now() - author.lastMessage.createdTimestamp > 50;
+  if(can){
+    return true;
+  }else{
+    author.lastMessage.reply('no');
+    return false;
+  }
+}
 
 // log in
 client.login(config.token);
