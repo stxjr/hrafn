@@ -7,6 +7,25 @@ const poll = require('./poll.js'); // handles polls
 
 const config = require('./config.json'); // get config from config.js
 
+//
+// functions
+//
+
+// how do dice even work (idk, must be hard)
+function rand (sides) {
+  return Math.ceil((Math.random() * sides));
+}
+
+function canUse (author) {
+  var can = Date.now() - author.lastMessage.createdTimestamp > 50;
+  if (can) {
+    return true;
+  } else {
+    author.lastMessage.reply('no');
+    return false;
+  }
+}
+
 client.on('ready', () => {
   console.log('ready');
 });
@@ -67,14 +86,12 @@ client.on('message', msg => {
 
 // join a voice channel
 client.on('message', msg => {
-  // if user is in dm, do nothing
-
   if (msg.content.match(/^join$/i)) {
     // check if user is in a channel
     if (msg.member.voiceChannel) {
       msg.member.voiceChannel.join()
-      .then(connection => {
-        return connection.playFile('/home/ubuntu/hrafn/micspam.mp3');
+      .then(connection => { // Connection is an instance of VoiceConnection
+        msg.reply('I have successfully connected to the channel!');
       })
       .then(dispatcher => {
         dispatcher.on('error',msg.reply('__**Uh oh!**__ \nyou need to be in a voice channel'))
@@ -110,25 +127,6 @@ client.on('message', msg => {
     }
   }
 });
-
-///
-/// funtions
-///
-
-// how do dice even work (idk, must be hard)
-function rand (sides) {
-  return Math.ceil((Math.random() * sides));
-}
-
-function canUse(author){
-  var can = Date.now() - author.lastMessage.createdTimestamp > 50;
-  if(can){
-    return true;
-  }else{
-    author.lastMessage.reply('no');
-    return false;
-  }
-}
 
 // log in
 client.login(config.token);
