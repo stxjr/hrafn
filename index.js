@@ -42,7 +42,7 @@ client.on('message', msg => {
 // ping pong
 client.on('message', msg => {
   if (msg.content.match(/^ping$/i)) {
-    msg.channelvar.send(msg.content.replace('i', 'o').replace('I', 'O'));
+    msg.channel.send(msg.content.replace('i', 'o').replace('I', 'O'));
   }
 });
 
