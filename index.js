@@ -22,8 +22,7 @@ client.on('message', msg => {
 
 // ping pong
 client.on('message', msg => {
-  if (msg.content.match(/^ping$/i) &&
-      canUse(msg.author)) {
+  if (msg.content.match(/^ping$/i)) {
     msg.channelvar.send(msg.content.replace('i', 'o').replace('I', 'O'));
   }
 });
@@ -47,8 +46,7 @@ client.on('message', msg => {
 // roll a die
 // usage: roll [sides]
 client.on('message', msg => {
-  if (msg.content.match(/^roll( \d*)?$/i) &&
-      canUse(msg.author)) { // dinner rolls
+  if (msg.content.match(/^roll( \d*)?$/i)) { // dinner rolls
     var sides = msg.content.replace(/[^0-9]/g, '');
     if (sides === '') {
       sides = 6;
@@ -79,9 +77,9 @@ client.on('message', msg => {
         return connection.playFile('/home/ubuntu/hrafn/micspam.mp3');
       })
       .then(dispatcher => {
-        dispatcher.on('error', console.error);
+        dispatcher.on('error',msg.reply('__**Uh oh!**__ \nyou need to be in a voice channel'))
       })
-      .catch(console.error);
+      .catch(msg.reply('__**Uh oh!**__ \nyou need to be in a voice channel'));
     }
   }
 });
