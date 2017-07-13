@@ -16,12 +16,12 @@ function rand (sides) {
   return Math.ceil((Math.random() * sides));
 }
 
-function canUse (author) {
-  var can = Date.now() - author.lastMessage.createdTimestamp > 50;
+function canUse (msg) {
+  var can = Date.now() - msg.createdTimestamp > 50;
   if (can) {
     return true;
   } else {
-    author.lastMessage.reply('no');
+    msg.author.reply('no');
     return false;
   }
 }
@@ -65,7 +65,7 @@ client.on('message', msg => {
 // roll a die
 // usage: roll [sides]
 client.on('message', msg => {
-  if (msg.content.match(/^roll( \d*)?$/i) && canUse(msg.author)) {
+  if (msg.content.match(/^roll( \d*)?$/i) && canUse(msg)) {
     var sides = msg.content.replace(/[^0-9]/g, '');
     if (sides === '') {
       sides = 6;
