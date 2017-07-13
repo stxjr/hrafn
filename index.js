@@ -1,4 +1,7 @@
 #!/usr/bin/node
+// TODO
+// fix canUse
+// make music have features
 
 const Discord = require('discord.js');
 const moment = require('moment');
@@ -17,7 +20,6 @@ function rand (sides) {
   return Math.ceil((Math.random() * sides));
 }
 
-// TODO: fix this
 // function canUse (msg) {
 //    var can = Date.now() - msg.createdTimestamp > 50;
 //    if (can) {
@@ -32,17 +34,26 @@ function rand (sides) {
 //   console.log(Math.floor((Date.now() - msg.createdTimestamp) / 1000));
 // }
 
-function log (msg, info) {
+// format events for logging
+function log (info, msg) {
   var date = moment().format('DD-MM-YY hh:mm:ss');
-  var name = msg.author.username;
-  var location = msg.guild
-    ? msg.guild.name + '#' + msg.channel.name
-    : 'not in guild';
-  console.log('[log] ' + date + ' ' + ' [' + location + '] ' + name + ': ' + info);
+  var output;
+
+  if (msg) {
+    var name = msg.author.username;
+    var location = msg.guild
+      ? msg.guild.name + '#' + msg.channel.name
+      : 'not in guild';
+    output = '[log] ' + date + ' [' + location + '] ' + name + ': ' + info;
+  } else {
+    output = '[log] ' + date + ' ' + info;
+  }
+
+  console.log(output);
 }
 
 client.on('ready', () => {
-  console.log('ready');
+  log('hrafn online');
 });
 
 // help
@@ -51,7 +62,7 @@ client.on('message', msg => {
     msg.channel.send('here are the commands available:\n' +
       '\tping: type ping to get a pong\n' +
       '\troll [n]: Type roll [n] to roll a die with n sides (defaults to 6)');
-    log(msg, 'help');
+    log('help', msg);
   }
 });
 
@@ -59,7 +70,7 @@ client.on('message', msg => {
 client.on('message', msg => {
   if (msg.content.match(/^ping$/i)) {
     msg.channel.send(msg.content.replace('i', 'o').replace('I', 'O'));
-    log(msg, 'ping');
+    log('ping', msg);
   }
 });
 
@@ -67,7 +78,7 @@ client.on('message', msg => {
 client.on('message', msg => {
   if (msg.content.match(/^id$/i)) {
     msg.channel.send(msg.channel.id);
-    log(msg, 'id');
+    log('id', msg);
   }
 });
 
@@ -77,7 +88,7 @@ client.on('message', msg => {
     var tempmsg = msg;
     msg.delete();
     tempmsg.reply('http://imgh.us/swe.jpg');
-    log(msg, 'swear filtered');
+    log('swear filtered', msg);
   }
 });
 
@@ -88,7 +99,7 @@ client.on('message', msg => {
     var sides = msg.content.replace(/[^0-9]/g, '') || 6;
     var result = rand(sides);
     msg.channel.send(result);
-    log(msg, 'die rolled: ' + result + ' out of ' + sides);
+    log('die rolled: ' + result + ' out of ' + sides, msg);
   }
 });
 
@@ -96,12 +107,11 @@ client.on('message', msg => {
 client.on('message', msg => {
   if (rand(120) === 120) {
     msg.channel.send('*allegedly...*');
-    log(msg, 'allegedly');
+    log('allegedly', msg);
   }
 });
 
 // join a voice channel
-// TODO: make it actually work
 client.on('message', msg => {
   if (msg.content.match(/^join$/i)) {
     // check if user is in a channel
@@ -111,7 +121,7 @@ client.on('message', msg => {
         msg.reply('I have successfully connected to the channel!');
       })
       .then(dispatcher => {
-        dispatcher.on('error',msg.reply('__**Uh oh!**__ \nyou need to be in a voice channel'))
+        dispatcher.on('error', msg.reply('__**Uh oh!**__ \nyou need to be in a voice channel'));
       })
       .catch(msg.reply('__**Uh oh!**__ \nyou need to be in a voice channel'));
     }
