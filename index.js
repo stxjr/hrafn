@@ -1,11 +1,12 @@
 #!/usr/bin/node
 
-// import the discord.js module
 const Discord = require('discord.js');
-const client = new Discord.Client();
-const poll = require('./poll.js'); // handles polls
+const moment = require('moment');
 
+const poll = require('./poll.js'); // handles polls
 const config = require('./config.json'); // get config from config.js
+
+const client = new Discord.Client();
 
 //
 // functions
@@ -16,14 +17,28 @@ function rand (sides) {
   return Math.ceil((Math.random() * sides));
 }
 
-function canUse (msg) {
-  var can = Date.now() - msg.createdTimestamp > 50;
-  if (can) {
-    return true;
-  } else {
-    msg.author.reply('no');
-    return false;
-  }
+// TODO: fix this
+// function canUse (msg) {
+//    var can = Date.now() - msg.createdTimestamp > 50;
+//    if (can) {
+//    return true;
+//    } else {
+//      msg.author.reply('no');
+//      return false;
+//    }
+//
+//   console.log(msg.createdTimestamp);
+//   console.log(Math.floor(Date.now()));
+//   console.log(Math.floor((Date.now() - msg.createdTimestamp) / 1000));
+// }
+
+function log (msg, info) {
+  var date = moment().format('DD-MM-YY hh:mm:ss');
+  var name = msg.author.username;
+  var location = msg.guild
+    ? msg.guild.name + '#' + msg.channel.name
+    : 'not in guild';
+  console.log('[log] ' + date + ' ' + ' [' + location + '] ' + name + ': ' + info);
 }
 
 client.on('ready', () => {
@@ -36,13 +51,15 @@ client.on('message', msg => {
     msg.channel.send('here are the commands available:\n' +
       '\tping: type ping to get a pong\n' +
       '\troll [n]: Type roll [n] to roll a die with n sides (defaults to 6)');
+    log(msg, 'help');
   }
 });
 
 // ping pong
 client.on('message', msg => {
-  if (msg.content.match(/^ping$/i) && canUse(msg.author)) {
+  if (msg.content.match(/^ping$/i)) {
     msg.channel.send(msg.content.replace('i', 'o').replace('I', 'O'));
+    log(msg, 'ping');
   }
 });
 
@@ -50,6 +67,7 @@ client.on('message', msg => {
 client.on('message', msg => {
   if (msg.content.match(/^id$/i)) {
     msg.channel.send(msg.channel.id);
+    log(msg, 'id');
   }
 });
 
@@ -59,20 +77,18 @@ client.on('message', msg => {
     var tempmsg = msg;
     msg.delete();
     tempmsg.reply('http://imgh.us/swe.jpg');
+    log(msg, 'swear filtered');
   }
 });
 
 // roll a die
 // usage: roll [sides]
 client.on('message', msg => {
-  if (msg.content.match(/^roll( \d*)?$/i) && canUse(msg)) {
-    var sides = msg.content.replace(/[^0-9]/g, '');
-    if (sides === '') {
-      sides = 6;
-    }
+  if (msg.content.match(/^roll( \d*)?$/i)) {
+    var sides = msg.content.replace(/[^0-9]/g, '') || 6;
     var result = rand(sides);
     msg.channel.send(result);
-    console.log('die rolled: ' + result + ' out of ' + sides);
+    log(msg, 'die rolled: ' + result + ' out of ' + sides);
   }
 });
 
@@ -80,11 +96,12 @@ client.on('message', msg => {
 client.on('message', msg => {
   if (rand(120) === 120) {
     msg.channel.send('*allegedly...*');
-    console.log('allegedly...');
+    log(msg, 'allegedly');
   }
 });
 
 // join a voice channel
+// TODO: make it actually work
 client.on('message', msg => {
   if (msg.content.match(/^join$/i)) {
     // check if user is in a channel
@@ -99,6 +116,9 @@ client.on('message', msg => {
     }
   }
 });
+
+// preston's playhouse
+// enter if you dare
 
 // Event trigger for poll management
 client.on('message', msg => {
