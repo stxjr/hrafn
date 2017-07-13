@@ -110,9 +110,10 @@ client.on('message', msg => {
       .then(connection => { // Connection is an instance of VoiceConnection
         msg.reply('I have successfully connected to the channel!');
       })
-      .catch(console.log);
-    } else {
-      msg.reply('You need to join a voice channel first!');
+      .then(dispatcher => {
+        dispatcher.on('error',msg.reply('__**Uh oh!**__ \nyou need to be in a voice channel'))
+      })
+      .catch(msg.reply('__**Uh oh!**__ \nyou need to be in a voice channel'));
     }
   }
 });
