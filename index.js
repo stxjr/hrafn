@@ -50,6 +50,10 @@ function log (info, msg) {
     output = '[log] ' + date + ' ' + info;
   }
 
+  fs.appendFile('hrafn.log', output, function (err) {
+    if (err) throw err;
+  });
+
   console.log(output);
 }
 
@@ -90,7 +94,9 @@ client.on('message', msg => {
     fs.readFile('hrafn.log', function (err, data) {
       if (err) throw err;
       var output = data.toString().split('\n').slice(-(lines)).join('\n');
+      msg.channel.send('```');
       msg.channel.send(output);
+      msg.channel.send('```');
     });
     log('last ' + lines + ' lines of log', msg);
   }
