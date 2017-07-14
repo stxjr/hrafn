@@ -50,7 +50,7 @@ function log (info, msg) {
     output = '[log] ' + date + ' ' + info;
   }
 
-  fs.appendFile('hrafn.log', output, function (err) {
+  fs.appendFile('hrafn.log', output + '\n', function (err) {
     if (err) throw err;
   });
 
@@ -58,7 +58,7 @@ function log (info, msg) {
 }
 
 client.on('ready', () => {
-  log('hrafn online');
+  log('all systems online'); // idk sounds cool
 });
 
 // help
@@ -67,6 +67,7 @@ client.on('message', msg => {
     msg.channel.send('here are the commands available:\n' +
       '\tping: type ping to get a pong\n' +
       '\troll [n]: Type roll [n] to roll a die with n sides (defaults to 6)');
+    msg.channel.send('```\na\nb\nc\n```');
     log('help', msg);
   }
 });
@@ -96,7 +97,7 @@ client.on('message', msg => {
       var output = data.toString().split('\n').slice(-(lines)).join('\n');
       msg.channel.send('```\n' + output + '\n```');
     });
-    log('last ' + lines + ' lines of log', msg);
+    log('last ' + 10 + ' lines of log given', msg);
   }
 });
 
@@ -113,8 +114,9 @@ client.on('message', msg => {
 // roll a die
 // usage: roll [sides]
 client.on('message', msg => {
-  if (msg.content.match(/^roll( \d*)?$/i)) {
-    var sides = msg.content.replace(/[^0-9]/g, '') || 6;
+  if (msg.content.match(/^roll(\s*\d*)?$/i)) {
+    const args = msg.content.split(/\s+/g);
+    var sides = args[1] || 6;
     var result = rand(sides);
     msg.channel.send(result);
     log('die rolled: ' + result + ' out of ' + sides, msg);
