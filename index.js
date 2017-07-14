@@ -67,7 +67,6 @@ client.on('message', msg => {
     msg.channel.send('here are the commands available:\n' +
       '\tping: type ping to get a pong\n' +
       '\troll [n]: Type roll [n] to roll a die with n sides (defaults to 6)');
-    msg.channel.send('```\na\nb\nc\n```');
     log('help', msg);
   }
 });
