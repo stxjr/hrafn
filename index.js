@@ -4,7 +4,8 @@
 // make music have features
 
 const Discord = require('discord.js');
-const moment = require('moment');
+var moment = require('moment');
+var fs = require('fs');
 
 const poll = require('./poll.js'); // handles polls
 const config = require('./config.json'); // get config from config.js
@@ -78,7 +79,20 @@ client.on('message', msg => {
 client.on('message', msg => {
   if (msg.content.match(/^id$/i)) {
     msg.channel.send(msg.channel.id);
-    log('id', msg);
+    log('id of channel given', msg);
+  }
+});
+
+// output last 10 lines of log
+client.on('message', msg => {
+  if (msg.content.match(/^log( \d*)?$/i)) {
+    var lines = msg.content.replace(/[^0-9]/g, '') || 10;
+    fs.readFile('hrafn.log', function (err, data) {
+      if (err) throw err;
+      var output = data.toString().split('\n').slice(-(lines)).join('\n');
+      msg.channel.send(output);
+    });
+    log('last ' + lines + ' lines of log', msg);
   }
 });
 
@@ -107,11 +121,12 @@ client.on('message', msg => {
 client.on('message', msg => {
   if (rand(120) === 120) {
     msg.channel.send('*allegedly...*');
-    log('allegedly', msg);
+    log('allegedly, rng', msg);
   }
 });
 
 // join a voice channel
+// TODO: idk fix this?
 client.on('message', msg => {
   if (msg.content.match(/^join$/i)) {
     // check if user is in a channel
