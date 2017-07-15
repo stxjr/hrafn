@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js &",
+    "start": "nohup node index.js &",
     "restart": "pkill node && node index.js &"
   },
   "author": "",
