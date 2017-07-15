@@ -9,6 +9,7 @@ var fs = require('fs');
 
 const poll = require('./poll.js'); // handles polls
 const config = require('./config.json'); // get config from config.js
+const games = require('./misc/games.json');
 
 const client = new Discord.Client();
 
@@ -59,15 +60,15 @@ function log (info, msg) {
 
 client.on('ready', () => {
   log('all systems online'); // idk sounds cool
+  var currentGame = games[Math.floor(Math.random() * (games.length))]; // don't replace with rand();
+  client.user.setGame(currentGame);
+  log('playing: ' + currentGame);
 });
 
 // help
 client.on('message', msg => {
   if (msg.content.match(/^help$/i)) {
-    msg.channel.send('here are the commands available:\n' +
-      '\tping: type ping to get a pong\n' +
-      '\troll [n]: Type roll [n] to roll a die with n sides (defaults to 6)');
-    log('help', msg);
+    log('help given', msg);
   }
 });
 
@@ -131,7 +132,7 @@ client.on('message', msg => {
 });
 
 // join a voice channel
-// TODO: idk fix this?
+// TODO: fix this
 client.on('message', msg => {
   if (msg.content.match(/^join$/i)) {
     // check if user is in a channel
