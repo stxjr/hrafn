@@ -11,31 +11,18 @@ const poll = require('./poll.js'); // handles polls
 const config = require('./config.json'); // get config from config.js
 const games = require('./games.json');
 const responses = require('./responses.json');
+const reactions = require('./reactions.json');
 
 const client = new Discord.Client();
 
-//
+// ---------
 // functions
-//
+// ---------
 
 // how do dice even work (idk, must be hard)
 function rand (sides) {
-  return Math.ceil((Math.random() * sides));
+  return Math.floor((Math.random() * sides)) + 1;
 }
-
-// function canUse (msg) {
-//    var can = Date.now() - msg.createdTimestamp > 50;
-//    if (can) {
-//    return true;
-//    } else {
-//      msg.author.reply('no');
-//      return false;
-//    }
-//
-//   console.log(msg.createdTimestamp);
-//   console.log(Math.floor(Date.now()));
-//   console.log(Math.floor((Date.now() - msg.createdTimestamp) / 1000));
-// }
 
 // format events for logging
 function log (info, msg) {
@@ -59,45 +46,54 @@ function log (info, msg) {
   console.log(output);
 }
 
+// handle errors
 client.on('error', (e) => console.error(e));
 client.on('warn', (e) => console.warn(e));
 
+// run on startup
 client.on('ready', () => {
   log('all systems online');
-  var currentGame = games[Math.floor(Math.random() * (games.length))];
+  var currentGame = games[rand(games.length) - 1];
   // don't replace with rand();
   client.user.setGame(currentGame);
   log('playing: ' + currentGame);
 });
 
-// //////// //
-// commands //
-// //////// //
-
+// commands
 client.on('message', msg => {
   if (msg.author.bot) return;
 
   // TODO: info message
   if (msg.content.match(/^info$/g)) {
     msg.channel.send(`
-
       `);
     log('info message given', msg);
   }
 
   // help message
+  // still TODO
   if (msg.content.match(/^help$/i)) {
-    // TODO: fix
-    // log('help message given', msg);
+    msg.channel.send(`
+      **help**
+      `);
+      // log('help message given', msg);
   }
 
   // loop through responses
   for (var word in responses) {
-    if (responses.hasOwnProperty(word)) {
-      if (msg.content.toLowerCase().includes(word)) {
-        msg.channel.send(responses[word]);
-        log('responded to "' + word + '" with "' + responses[word] + '"', msg);
-      }
+    if (responses.hasOwnProperty(word) &&
+      msg.content.toLowerCase().includes(word)) {
+      msg.channel.send(responses[word]);
+      log('responded to "' + word + '" with "' + responses[word] + '"', msg);
+    }
+  }
+
+  // loop through reactions
+  for (var word in reactions) {
+    if (reactions.hasOwnProperty(word) &&
+      msg.content.toLowerCase().includes(word)) {
+      msg.react(reactions[word]);
+      log('reacted to "' + word + '" with "' + reactions[word] + '"', msg);
     }
   }
 
@@ -132,6 +128,7 @@ client.on('message', msg => {
     const args = msg.content.split(/\s+/g);
     var sides = args[1] || 6;
     var result = rand(args[1] || 6);
+
     msg.channel.send(result);
     log('die rolled: ' + result + ' out of ' + sides, msg);
   }
@@ -139,7 +136,7 @@ client.on('message', msg => {
   // allegedly...
   if (rand(120) === 120) {
     msg.channel.send('*allegedly...*');
-    log('allegedly, rng', msg);
+    log('allegedly triggered', msg);
   }
 
   // join a voice channel
@@ -191,6 +188,15 @@ client.on('message', msg => {
           msg.channel.send('__**Uh oh!**__\nThere is not an active poll to close. You can use:\n`poll create`\n to create a new poll');
         }
     }
+  }
+});
+
+// admin-only commands
+// TODO
+client.on('message', msg => {
+  if (msg.author.bot) return;
+  if (msg.author.id === 260157586618318859) {
+    msg.channel.send('yo');
   }
 });
 

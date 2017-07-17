@@ -6,11 +6,12 @@
   "dependencies": {
     "discord.js": "^11.1.0",
     "moment": "^2.18.1",
-    "node-opus": "^0.2.6"
+    "node-opus": "^0.2.6",
+    "youtube-search": "^1.0.10"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nohup node index.js &",
+    "start": "nohup node index.js >/dev/null &",
     "restart": "pkill node && node index.js &"
   },
   "author": "",
