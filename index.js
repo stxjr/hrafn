@@ -1,7 +1,4 @@
 #!/usr/bin/node
-// TODO
-// fix canUse
-// make music have features
 
 const Discord = require('discord.js');
 var moment = require('moment');
@@ -15,9 +12,7 @@ const reactions = require('./reactions.json');
 
 const client = new Discord.Client();
 
-// ---------
 // functions
-// ---------
 
 // how do dice even work (idk, must be hard)
 function rand (sides) {
@@ -52,6 +47,7 @@ client.on('warn', (e) => console.warn(e));
 
 // run on startup
 client.on('ready', () => {
+  log('------------------');
   log('all systems online');
   var currentGame = games[rand(games.length) - 1];
   // don't replace with rand();
@@ -63,59 +59,64 @@ client.on('ready', () => {
 client.on('message', msg => {
   if (msg.author.bot) return;
 
+  var input = msg.content.toLowerCase();
+  var args = msg.content.toLowerCase().split(/\s+/g);
+
   // TODO: info message
-  if (msg.content.match(/^info$/g)) {
+  if (input.match(/^info$/)) {
     msg.channel.send(`
       `);
     log('info message given', msg);
   }
 
-  // help message
-  // still TODO
-  if (msg.content.match(/^help$/i)) {
+  // TODO: help message
+  if (input.match(/^help$/)) {
     msg.channel.send(`
-      **help**
+
       `);
       // log('help message given', msg);
   }
 
   // loop through responses
-  for (var word in responses) {
-    if (responses.hasOwnProperty(word) &&
-      msg.content.toLowerCase().includes(word)) {
-      msg.channel.send(responses[word]);
-      log('responded to "' + word + '" with "' + responses[word] + '"', msg);
+  for (let key in responses) {
+    if (input.includes(key)) {
+      msg.channel.send(responses[key]);
+      log('responded to "' + key + '" with "' + responses[key] + '"', msg);
     }
   }
 
   // loop through reactions
-  for (var word in reactions) {
-    if (reactions.hasOwnProperty(word) &&
-      msg.content.toLowerCase().includes(word)) {
-      msg.react(reactions[word]);
-      log('reacted to "' + word + '" with "' + reactions[word] + '"', msg);
+  for (let key in reactions) {
+    if (input.includes(key)) {
+      msg.react(reactions[key]);
+      log('reacted to "' + key + '" with "' + reactions[key] + '"', msg);
     }
   }
 
   // get id of channel
-  if (msg.content.match(/^id$/i)) {
+  if (args[0] === 'id') {
     msg.channel.send(msg.channel.id);
     log('id of channel given', msg);
   }
 
   // output last 10 lines of log
-  if (msg.content.match(/^log( \d*)?$/i)) {
-    var lines = msg.content.replace(/[^0-9]/g, '') || 10;
+  if (args[0] === 'log') {
+    var lines = args[1] || 10;
     fs.readFile('hrafn.log', (err, data) => {
       if (err) throw err;
-      var output = data.toString().split('\n').slice(-(lines)).join('\n');
+      var output = data
+        .toString()
+        .replace(/\n$/, '') // remove trailing \n
+        .split('\n')
+        .slice(-(lines))
+        .join('\n');
       msg.channel.send('```\n' + output + '\n```');
     });
-    log('last ' + 10 + ' lines of log given', msg);
+    log('last ' + lines + ' lines of log given', msg);
   }
 
   // swear filter
-  if (msg.content.match(/bazinga/i)) {
+  if (input.includes('bazinga')) {
     var tempmsg = msg;
     msg.delete();
     tempmsg.reply('http://imgh.us/swe.jpg');
@@ -124,10 +125,9 @@ client.on('message', msg => {
 
   // roll a die
   // usage: roll [sides]
-  if (msg.content.match(/^roll(\s*\d*)?$/i)) {
-    const args = msg.content.split(/\s+/g);
+  if (args[0] === 'roll') {
     var sides = args[1] || 6;
-    var result = rand(args[1] || 6);
+    var result = rand(sides);
 
     msg.channel.send(result);
     log('die rolled: ' + result + ' out of ' + sides, msg);
@@ -139,34 +139,10 @@ client.on('message', msg => {
     log('allegedly triggered', msg);
   }
 
-  // join a voice channel
-  // TODO: fix this
-  if (msg.content.match(/^join$/i)) {
-    // check if user is in a channel
-    if (msg.member.voiceChannel) {
-      msg.member.voiceChannel.join()
-      .then(connection => { // Connection is an instance of VoiceConnection
-        msg.reply('I have successfully connected to the channel!');
-      })
-      .then(dispatcher => {
-        dispatcher.on('error', msg.reply(`
-          __**Uh oh!**__
-          you need to be in a voice channel
-          `));
-      })
-      .catch(msg.reply(`
-        __**Uh oh!**__
-        you need to be in a voice channel
-      `));
-    }
-  }
-
   // preston's playhouse
   // enter if you dare
 
   // Event trigger for poll management
-
-  var args = msg.content.split(' ');
 
   if (args[0] === 'poll') {
     if (args.length < 2) {
@@ -192,11 +168,34 @@ client.on('message', msg => {
 });
 
 // admin-only commands
-// TODO
 client.on('message', msg => {
   if (msg.author.bot) return;
-  if (msg.author.id === 260157586618318859) {
-    msg.channel.send('yo');
+  if (!msg.member.roles.has(config.adminRoleId)) return;
+
+  var input = msg.content.toLowerCase();
+  var args = msg.content.toLowerCase().split(/\s+/g);
+
+  const clean = text => {
+    if (typeof (text) === 'string') {
+      return text.replace(/`/g, '`' + String.fromCharCode(8203)).replace(/@/g, '@' + String.fromCharCode(8203));
+    } else {
+      return text;
+    }
+  };
+
+  if (args[0] === 'eval') {
+    try {
+      const code = args.slice(1).join(' ');
+      let evaled = eval(code);
+
+      if (typeof evaled !== 'string') {
+        evaled = require('util').inspect(evaled);
+      }
+
+      msg.channel.send(clean(evaled), {code: 'xl'});
+    } catch (err) {
+      msg.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
+    }
   }
 });
 
