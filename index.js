@@ -175,6 +175,7 @@ client.on('message', msg => {
   var input = msg.content.toLowerCase();
   var args = msg.content.toLowerCase().split(/\s+/g);
 
+  // something something don't mention people
   const clean = text => {
     if (typeof (text) === 'string') {
       return text.replace(/`/g, '`' + String.fromCharCode(8203)).replace(/@/g, '@' + String.fromCharCode(8203));
@@ -193,8 +194,10 @@ client.on('message', msg => {
       }
 
       msg.channel.send(clean(evaled), {code: 'xl'});
+      log('evaluated [' + code + '] with result: [' + evaled + ']', msg);
     } catch (err) {
       msg.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
+      log('error on eval: ' + err);
     }
   }
 });
