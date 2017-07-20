@@ -50,32 +50,15 @@ client.on('ready', () => {
   log('------------------');
   log('all systems online');
   var currentGame = games[rand(games.length) - 1];
-  // don't replace with rand();
   client.user.setGame(currentGame);
   log('playing: ' + currentGame);
 });
 
-// commands
+// things that trigger without a command
 client.on('message', msg => {
   if (msg.author.bot) return;
 
-  var input = msg.content.toLowerCase();
-  var args = msg.content.toLowerCase().split(/\s+/g);
-
-  // TODO: info message
-  if (input.match(/^info$/)) {
-    msg.channel.send(`
-      `);
-    log('info message given', msg);
-  }
-
-  // TODO: help message
-  if (input.match(/^help$/)) {
-    msg.channel.send(`
-
-      `);
-      // log('help message given', msg);
-  }
+  var input = msg.content;
 
   // loop through responses
   for (let key in responses) {
@@ -93,50 +76,46 @@ client.on('message', msg => {
     }
   }
 
-  // get id of channel
-  if (args[0] === 'id') {
-    msg.channel.send(msg.channel.id);
-    log('id of channel given', msg);
-  }
-
-  // output last 10 lines of log
-  if (args[0] === 'log') {
-    var lines = args[1] || 10;
-    fs.readFile('hrafn.log', (err, data) => {
-      if (err) throw err;
-      var output = data
-        .toString()
-        .replace(/\n$/, '') // remove trailing \n
-        .split('\n')
-        .slice(-(lines))
-        .join('\n');
-      msg.channel.send('```\n' + output + '\n```');
-    });
-    log('last ' + lines + ' lines of log given', msg);
+  // allegedly...
+  // d120 in honor of walter
+  if (rand(120) === 120) {
+    msg.channel.send('*allegedly...*');
+    log('allegedly triggered', msg);
   }
 
   // swear filter
   if (input.includes('bazinga')) {
-    var tempmsg = msg;
+    msg.reply('http://imgh.us/swe.jpg');
     msg.delete();
-    tempmsg.reply('http://imgh.us/swe.jpg');
     log('swear filtered', msg);
+  }
+});
+
+// common (plebian) commands
+client.on('message', msg => {
+  if (msg.author.bot) return;
+  if (!msg.content.startsWith(config.commonPrefix)) return;
+
+  var args = msg.content.slice(1).split(/\s+/g);
+
+  // TODO: info message
+  if (args[0] === 'info') {
+    // log('info message given', msg);
+  }
+
+  // TODO: help message
+  if (args[0] === 'help') {
+      // log('help message given', msg);
   }
 
   // roll a die
-  // usage: roll [sides]
+  // usage: :roll [sides]
   if (args[0] === 'roll') {
     var sides = args[1] || 6;
     var result = rand(sides);
 
     msg.channel.send(result);
     log('die rolled: ' + result + ' out of ' + sides, msg);
-  }
-
-  // allegedly...
-  if (rand(120) === 120) {
-    msg.channel.send('*allegedly...*');
-    log('allegedly triggered', msg);
   }
 
   // preston's playhouse
@@ -170,10 +149,35 @@ client.on('message', msg => {
 // admin-only commands
 client.on('message', msg => {
   if (msg.author.bot) return;
-  if (!msg.member.roles.has(config.adminRoleId)) return;
+  if (!msg.content.startsWith(config.adminPrefix)) return;
+  if (!msg.member.roles.has(config.adminRoleId)) {
+    msg.author.reply('you don\'t have the right permissions to do that');
+    return;
+  }
 
-  var input = msg.content.toLowerCase();
-  var args = msg.content.toLowerCase().split(/\s+/g);
+  var args = msg.content.slice(1).split(/\s+/g);
+
+  // get id of channel
+  if (args[0] === 'id') {
+    msg.channel.send(msg.channel.id);
+    log('id of channel given', msg);
+  }
+
+  // output last (n || 10) lines of log
+  if (args[0] === 'log') {
+    var lines = args[1] || 10;
+    fs.readFile('hrafn.log', (err, data) => {
+      if (err) throw err;
+      var output = data
+        .toString()
+        .replace(/\n$/, '') // remove trailing \n
+        .split('\n')
+        .slice(-(lines))
+        .join('\n');
+      msg.channel.send('```\n' + output + '\n```');
+    });
+    log('last ' + lines + ' lines of log given', msg);
+  }
 
   // something something don't mention people
   const clean = text => {
