@@ -62,7 +62,7 @@ client.on('message', msg => {
   // loop through responses
   for (let key in responses) {
     let regex = new RegExp('\\b' + key + '\\b');
-    if (input.match(regex)) {
+    if (input.toLowerCase().match(regex)) {
       msg.channel.send(responses[key]);
       log('responded to "' + key + '" with "' + responses[key] + '"', msg);
     }
@@ -108,7 +108,7 @@ client.on('message', msg => {
     msg.channel.send(`
       \`\`\`
       commands available:
-      todo: put something here you dummkopf
+      todo: put something here you dummkopf?z
 
       \`\`\`
       `);
