@@ -25,8 +25,8 @@ function log (info, msg) {
   var output;
 
   if (msg) {
-    var name = msg.author.username;
-    var location = msg.guild
+    let name = msg.author.username;
+    let location = msg.guild
       ? msg.guild.name + '#' + msg.channel.name
       : 'not in guild';
     output = '[log] ' + date + ' [' + location + '] ' + name + ': ' + info;
@@ -47,7 +47,6 @@ client.on('warn', (e) => console.warn(e));
 
 // run on startup
 client.on('ready', () => {
-  log('------------------');
   log('all systems online');
   var currentGame = games[rand(games.length) - 1];
   client.user.setGame(currentGame);
@@ -62,7 +61,8 @@ client.on('message', msg => {
 
   // loop through responses
   for (let key in responses) {
-    if (input.includes(key)) {
+    let regex = new RegExp('\\b' + key + '\\b');
+    if (input.match(regex)) {
       msg.channel.send(responses[key]);
       log('responded to "' + key + '" with "' + responses[key] + '"', msg);
     }
@@ -105,17 +105,37 @@ client.on('message', msg => {
 
   // TODO: help message
   if (args[0] === 'help') {
-      // log('help message given', msg);
+    msg.channel.send(`
+      \`\`\`
+      commands available:
+      todo: put something here you dummkopf
+
+      \`\`\`
+      `);
+    // log('help message given', msg);
   }
 
   // roll a die
   // usage: :roll [sides]
   if (args[0] === 'roll') {
-    var sides = args[1] || 6;
-    var result = rand(sides);
+    let sides = args[1] || 6;
+    let result = rand(sides);
 
     msg.channel.send(result);
     log('die rolled: ' + result + ' out of ' + sides, msg);
+  }
+
+  // flip a coin
+  if (args[0] === 'flip') {
+    let result;
+    if (rand(2) === 1) {
+      result = 'heads';
+    } else {
+      result = 'tails';
+    }
+
+    msg.channel.send(result);
+    log('coin flipped: landed on ' + result);
   }
 
   // preston's playhouse
@@ -151,7 +171,7 @@ client.on('message', msg => {
   if (msg.author.bot) return;
   if (!msg.content.startsWith(config.adminPrefix)) return;
   if (!msg.member.roles.has(config.adminRoleId)) {
-    msg.author.reply('you don\'t have the right permissions to do that');
+    msg.reply('you don\'t have the right permissions to do that');
     return;
   }
 
