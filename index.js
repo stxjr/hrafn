@@ -4,42 +4,14 @@ const Discord = require('discord.js');
 var moment = require('moment');
 var fs = require('fs');
 
+const functions = require('./functions.js');
 const poll = require('./poll.js'); // handles polls
-const config = require('./config.json'); // get config from config.js
-const games = require('./games.json');
-const responses = require('./responses.json');
-const reactions = require('./reactions.json');
+const config = require('./json/config.json'); // get config from config.js
+const games = require('./json/games.json');
+const responses = require('./json/responses.json');
+const reactions = require('./json/reactions.json');
 
 const client = new Discord.Client();
-
-// functions
-
-// how do dice even work (idk, must be hard)
-function rand (sides) {
-  return Math.floor((Math.random() * sides)) + 1;
-}
-
-// format events for logging
-function log (info, msg) {
-  var date = moment().format('DD-MM-YY hh:mm:ss');
-  var output;
-
-  if (msg) {
-    let name = msg.author.username;
-    let location = msg.guild
-      ? msg.guild.name + '#' + msg.channel.name
-      : 'not in guild';
-    output = '[log] ' + date + ' [' + location + '] ' + name + ': ' + info;
-  } else {
-    output = '[log] ' + date + ' ' + info;
-  }
-
-  fs.appendFile('hrafn.log', output + '\n', (err) => {
-    if (err) throw err;
-  });
-
-  console.log(output);
-}
 
 // handle errors
 client.on('error', (e) => console.error(e));
@@ -47,10 +19,10 @@ client.on('warn', (e) => console.warn(e));
 
 // run on startup
 client.on('ready', () => {
-  log('all systems online');
-  var currentGame = games[rand(games.length) - 1];
+  functions.log('all systems online');
+  var currentGame = games[functions.rand(games.length) - 1];
   client.user.setGame(currentGame);
-  log('playing: ' + currentGame);
+  functions.log('playing: ' + currentGame);
 });
 
 // things that trigger without a command
@@ -64,7 +36,7 @@ client.on('message', msg => {
     let regex = new RegExp('\\b' + key + '\\b');
     if (input.toLowerCase().match(regex)) {
       msg.channel.send(responses[key]);
-      log('responded to "' + key + '" with "' + responses[key] + '"', msg);
+      functions.log('responded to "' + key + '" with "' + responses[key] + '"', msg);
     }
   }
 
@@ -72,22 +44,22 @@ client.on('message', msg => {
   for (let key in reactions) {
     if (input.includes(key)) {
       msg.react(reactions[key]);
-      log('reacted to "' + key + '" with "' + reactions[key] + '"', msg);
+      functions.log('reacted to "' + key + '" with "' + reactions[key] + '"', msg);
     }
   }
 
   // allegedly...
   // d120 in honor of walter
-  if (rand(120) === 120) {
+  if (functions.rand(120) === 120) {
     msg.channel.send('*allegedly...*');
-    log('allegedly triggered', msg);
+    functions.log('allegedly triggered', msg);
   }
 
   // swear filter
   if (input.includes('bazinga')) {
     msg.reply('http://imgh.us/swe.jpg');
     msg.delete();
-    log('swear filtered', msg);
+    functions.log('swear filtered', msg);
   }
 });
 
@@ -96,46 +68,20 @@ client.on('message', msg => {
   if (msg.author.bot) return;
   if (!msg.content.startsWith(config.commonPrefix)) return;
 
-  var args = msg.content.slice(1).split(/\s+/g);
+  const args = msg.content.split(/\s+/g);
+  const command = args.shift().slice(config.commonPrefix.length).toLowerCase();
+
+  try {
+    let commandFile = require(`./commands/${command}.js`);
+    commandFile.run(client, msg, args);
+  } catch (err) {
+    functions.log(err);
+  }
 
   // TODO: info message
   if (args[0] === 'info') {
-    // log('info message given', msg);
-  }
-
-  // TODO: help message
-  if (args[0] === 'help') {
-    msg.channel.send(`
-      \`\`\`
-      commands available:
-      todo: put something here you dummkopf?z
-
-      \`\`\`
-      `);
-    // log('help message given', msg);
-  }
-
-  // roll a die
-  // usage: :roll [sides]
-  if (args[0] === 'roll') {
-    let sides = args[1] || 6;
-    let result = rand(sides);
-
-    msg.channel.send(result);
-    log('die rolled: ' + result + ' out of ' + sides, msg);
-  }
-
-  // flip a coin
-  if (args[0] === 'flip') {
-    let result;
-    if (rand(2) === 1) {
-      result = 'heads';
-    } else {
-      result = 'tails';
-    }
-
-    msg.channel.send(result);
-    log('coin flipped: landed on ' + result);
+    // TODO: show prefix, uptime, creator
+    // functions.log('info message given', msg);
   }
 
   // preston's playhouse
@@ -180,7 +126,7 @@ client.on('message', msg => {
   // get id of channel
   if (args[0] === 'id') {
     msg.channel.send(msg.channel.id);
-    log('id of channel given', msg);
+    functions.log('id of channel given', msg);
   }
 
   // output last (n || 10) lines of log
@@ -196,7 +142,7 @@ client.on('message', msg => {
         .join('\n');
       msg.channel.send('```\n' + output + '\n```');
     });
-    log('last ' + lines + ' lines of log given', msg);
+    functions.log('last ' + lines + ' lines of log given', msg);
   }
 
   // something something don't mention people
@@ -214,14 +160,14 @@ client.on('message', msg => {
       let evaled = eval(code);
 
       if (typeof evaled !== 'string') {
-        evaled = require('util').inspect(evaled);
+        evaled = require('functions').inspect(evaled);
       }
 
       msg.channel.send(clean(evaled), {code: 'xl'});
-      log('evaluated [' + code + '] with result: [' + evaled + ']', msg);
+      functions.log('evaluated [' + code + '] with result: [' + evaled + ']', msg);
     } catch (err) {
       msg.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
-      log('error on eval: ' + err);
+      functions.log('error on eval: ' + err);
     }
   }
 });
