@@ -1,8 +1,8 @@
 #!/usr/bin/node
 
 const Discord = require('discord.js');
-var moment = require('moment');
-var fs = require('fs');
+const moment = require('moment');
+const fs = require('fs');
 
 const functions = require('./functions.js');
 const poll = require('./poll.js'); // handles polls
@@ -121,54 +121,14 @@ client.on('message', msg => {
     return;
   }
 
-  var args = msg.content.slice(1).split(/\s+/g);
+  const args = msg.content.split(/\s+/g);
+  const command = args.shift().slice(config.adminPrefix.length).toLowerCase();
 
-  // get id of channel
-  if (args[0] === 'id') {
-    msg.channel.send(msg.channel.id);
-    functions.log('id of channel given', msg);
-  }
-
-  // output last (n || 10) lines of log
-  if (args[0] === 'log') {
-    var lines = args[1] || 10;
-    fs.readFile('hrafn.log', (err, data) => {
-      if (err) throw err;
-      var output = data
-        .toString()
-        .replace(/\n$/, '') // remove trailing \n
-        .split('\n')
-        .slice(-(lines))
-        .join('\n');
-      msg.channel.send('```\n' + output + '\n```');
-    });
-    functions.log('last ' + lines + ' lines of log given', msg);
-  }
-
-  // something something don't mention people
-  const clean = text => {
-    if (typeof (text) === 'string') {
-      return text.replace(/`/g, '`' + String.fromCharCode(8203)).replace(/@/g, '@' + String.fromCharCode(8203));
-    } else {
-      return text;
-    }
-  };
-
-  if (args[0] === 'eval') {
-    try {
-      const code = args.slice(1).join(' ');
-      let evaled = eval(code);
-
-      if (typeof evaled !== 'string') {
-        evaled = require('functions').inspect(evaled);
-      }
-
-      msg.channel.send(clean(evaled), {code: 'xl'});
-      functions.log('evaluated [' + code + '] with result: [' + evaled + ']', msg);
-    } catch (err) {
-      msg.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
-      functions.log('error on eval: ' + err);
-    }
+  try {
+    let commandFile = require(`./admin-commands/${command}.js`);
+    commandFile.run(client, msg, args);
+  } catch (err) {
+    functions.log(err);
   }
 });
 

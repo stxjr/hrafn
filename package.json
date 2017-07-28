@@ -7,8 +7,7 @@
     "discord.js": "^11.1.0",
     "ffmpeg-binaries": "^3.2.2-3",
     "moment": "^2.18.1",
-    "node-opus": "^0.2.6",
-    "pad": "^1.1.0"
+    "node-opus": "^0.2.6"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

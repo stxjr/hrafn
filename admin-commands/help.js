@@ -6,10 +6,10 @@ exports.help = 'show this help message';
 exports.usage = '`help`: show a helpful help message';
 exports.run = (client, msg, args) => {
   if (!args[0]) { // full help message
-    fs.readdir('./commands/', (err, files) => {
+    fs.readdir('./admin-commands/', (err, files) => {
       if (err) return console.error(err);
 
-      var helpMessage = 'here are the available commands:```xl\n';
+      var helpMessage = 'here are the available admin commands:```xl\n';
 
       files.forEach(file => {
         let command = require('./' + file);
@@ -24,7 +24,7 @@ exports.run = (client, msg, args) => {
   }
 
   if (args[0]) {
-    fs.readdir('./commands/', (err, files) => {
+    fs.readdir('./admin-commands/', (err, files) => {
       if (err) return console.error(err);
 
       if (files.indexOf(args[0] + '.js') > -1) { // if array contains

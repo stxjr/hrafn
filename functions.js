@@ -16,7 +16,7 @@ exports.log = (info, msg) => {
     let location = msg.guild
       ? msg.guild.name + '#' + msg.channel.name
       : 'not in guild';
-    output = '[log] ' + date + ' [' + location + '] ' + name + ': ' + info;
+    output = '[log] ' + date + ' [' + location + '] [' + name + '] ' + info;
   } else {
     output = '[log] ' + date + ' ' + info;
   }
