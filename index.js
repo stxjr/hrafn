@@ -6,6 +6,7 @@ const fs = require('fs');
 
 const functions = require('./functions.js');
 const poll = require('./poll.js'); // handles polls
+
 const config = require('./json/config.json'); // get config from config.js
 const games = require('./json/games.json');
 const responses = require('./json/responses.json');
@@ -76,12 +77,6 @@ client.on('message', msg => {
     commandFile.run(client, msg, args);
   } catch (err) {
     functions.log(err);
-  }
-
-  // TODO: info message
-  if (args[0] === 'info') {
-    // TODO: show prefix, uptime, creator
-    // functions.log('info message given', msg);
   }
 
   // preston's playhouse

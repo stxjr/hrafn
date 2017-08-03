@@ -9,15 +9,13 @@ exports.run = (client, msg, args) => {
     fs.readdir('./commands/', (err, files) => {
       if (err) return console.error(err);
 
-      var helpMessage = 'here are the available commands:```xl\n';
+      var helpMessage = 'here are the available commands:\n';
 
       files.forEach(file => {
         let command = require('./' + file);
         let commandName = file.split('.')[0];
-        helpMessage += ('\n' + commandName + ' : ' + command.help);
+        helpMessage += ('\n`' + commandName + ' : ' + command.help + '`');
       });
-
-      helpMessage += '```';
 
       msg.channel.send(helpMessage);
     });
