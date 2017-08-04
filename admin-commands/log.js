@@ -2,8 +2,8 @@ const fs = require('fs');
 
 const functions = require('../functions.js');
 
-exports.help = 'print out hrafn\'s log';
-exports.usage = '`log [n]`: print out n (default 10) lines of log';
+exports.help = 'print out n lines of log (default 10)';
+exports.usage = 'log [n]';
 exports.run = (client, msg, args) => {
   var lines = args[0] || 10;
   fs.readFile('hrafn.log', (err, data) => {

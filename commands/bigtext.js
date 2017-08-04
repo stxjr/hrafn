@@ -1,7 +1,7 @@
 const functions = require('../functions.js');
 
 exports.help = 'make text big';
-exports.usage = '`bigtext [text]`: make text big';
+exports.usage = 'bigtext [text]';
 exports.run = (client, msg, args) => {
   let result = '';
 
@@ -24,7 +24,7 @@ exports.run = (client, msg, args) => {
     } else if (char.match(/[0-9]/i)) {
       result += ':' + numbers[char] + ':';
     } else if (char == ' ') {
-      result += '          ';
+      result += '          '; // trust me it works
     }
   });
   msg.channel.send(result);

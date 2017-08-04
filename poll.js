@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 var live = false;
 var data = {
-  author: "",
+  author: '',
   options: [],
   votes: []
 };

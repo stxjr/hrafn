@@ -3,7 +3,7 @@ const fs = require('fs');
 const functions = require('../functions.js');
 
 exports.help = 'evalate a piece of code';
-exports.usage = '`eval`: evaluate a piece of code';
+exports.usage = 'eval [code]';
 exports.run = (client, msg, args) => {
   // something something don't mention people
   const clean = text => {
@@ -23,7 +23,7 @@ exports.run = (client, msg, args) => {
     }
     if (evaled.length >= 2000) {
       msg.channel.send('error: output is over 2000 characters');
-      functions.log('evaluated [' + code + ']; output was over 2000 characters', msg);
+      functions.log('evaluated [' + code + '] output was over 2000 characters', msg);
     } else {
       msg.channel.send(clean(evaled), {code: 'js'});
       functions.log('evaluated [' + code + '] with result: [' + evaled + ']', msg);

@@ -1,42 +1,27 @@
+const Discord = require('discord.js');
 const fs = require('fs');
 
 const functions = require('../functions.js');
 
+const config = require('../json/config.json');
+
 exports.help = 'show this help message';
-exports.usage = '`help`: show a helpful help message';
+exports.usage = 'help';
 exports.run = (client, msg, args) => {
   if (!args[0]) { // full help message
     fs.readdir('./admin-commands/', (err, files) => {
       if (err) return console.error(err);
 
-      var helpMessage = 'here are the available admin commands:```xl\n';
+      var embed = new Discord.RichEmbed()
+        .setColor(0x458588)
+        .setFooter('to view common commands, type ' + config.commonPrefix + 'help', '');
 
       files.forEach(file => {
         let command = require('./' + file);
-        let commandName = file.split('.')[0];
-        helpMessage += ('\n' + commandName + ' : ' + command.help);
+        embed.addField('`' + config.adminPrefix + command.usage + '`', '    ' + command.help);
       });
 
-      helpMessage += '```';
-
-      msg.channel.send(helpMessage);
+      msg.channel.send({embed});
     });
   }
-
-  if (args[0]) {
-    fs.readdir('./admin-commands/', (err, files) => {
-      if (err) return console.error(err);
-
-      if (files.indexOf(args[0] + '.js') > -1) { // if array contains
-        let command = require('./' + args[0] + '.js');
-        msg.channel.send(command.usage);
-      } else {
-        msg.channel.send('"' + args[0] + '" is not a valid command');
-      }
-    });
-  }
-
-  // !help -> command.help
-  // !help [command] -> command.usage
-  // functions.log('help message given', msg);
 };
