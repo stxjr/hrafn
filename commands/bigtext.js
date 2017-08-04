@@ -18,7 +18,7 @@ exports.run = (client, msg, args) => {
     '9': 'nine'
   };
 
-  args.join(' ').split('').forEach((char) => {
+  args.join(' ').toLowerCase().split('').forEach((char) => {
     if (char.match(/[a-z]/i)) {
       result += ':regional_indicator_' + char + ':';
     } else if (char.match(/[0-9]/i)) {
