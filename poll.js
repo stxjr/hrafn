@@ -17,6 +17,6 @@ exports.endPoll = function (msg) {
   live = false;
 };
 
-exports.isLive = function (msg) {
+exports.isLive = function (msg) { // TODO: remove this, just use poll.live (line 2)
   return live;
 };

@@ -29,6 +29,8 @@ client.on('ready', () => {
 // things that trigger without a command
 client.on('message', msg => {
   if (msg.author.bot) return;
+  if (msg.content.startsWith(config.commonPrefix)) return;
+  if (msg.content.startsWith(config.adminPrefix)) return;
 
   var input = msg.content;
 
@@ -84,27 +86,28 @@ client.on('message', msg => {
 
   // Event trigger for poll management
 
-  if (args[0] === 'poll') {
-    if (args.length < 2) {
-      msg.channel.send('__**Uh oh!**__ \nI don\'t understand! Try these commands to help you\n`poll help || poll [option]`');
-      return;
-    }
-    switch (args[1]) {
-      case 'create':
-        if (!poll.isLive()) {
-          poll.createPoll(msg);
-        } else {
-          msg.channel.send('__**Uh oh!**__\nA poll is aleady in progress. Please end that poll to create a new one.');
-        }
-        break;
-      case 'end':
-        if (poll.isLive()) {
-          poll.endPoll(msg);
-        } else {
-          msg.channel.send('__**Uh oh!**__\nThere is not an active poll to close. You can use:\n`poll create`\n to create a new poll');
-        }
-    }
-  }
+  // TODO: remove
+  // if (args[0] === 'poll') {
+  //   if (args.length < 2) {
+  //     msg.channel.send('__**Uh oh!**__ \nI don\'t understand! Try these commands to help you\n`poll help || poll [option]`');
+  //     return;
+  //   }
+  //   switch (args[1]) {
+  //     case 'create':
+  //       if (!poll.isLive()) {
+  //         poll.createPoll(msg);
+  //       } else {
+  //         msg.channel.send('__**Uh oh!**__\nA poll is aleady in progress. Please end that poll to create a new one.');
+  //       }
+  //       break;
+  //     case 'end':
+  //       if (poll.isLive()) {
+  //         poll.endPoll(msg);
+  //       } else {
+  //         msg.channel.send('__**Uh oh!**__\nThere is not an active poll to close. You can use:\n`poll create`\n to create a new poll');
+  //       }
+  //   }
+  // }
 });
 
 // admin-only commands
